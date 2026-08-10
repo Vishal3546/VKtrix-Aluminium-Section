@@ -7,12 +7,18 @@ import { Button } from './ui/button';
 import { Save, Printer, Settings2, Calculator } from 'lucide-react';
 import VerifyQuoteModal from './VerifyQuoteModal';
 import ExpensesTaxPanel from './ExpensesTaxPanel';
+import { fetchParties, fetchProjects } from '@/lib/api';
 
 export default function QuotationView() {
   const [selectedDesigns, setSelectedDesigns] = useState<any[]>([]);
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [isTaxPanelOpen, setIsTaxPanelOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  const [parties, setParties] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [selectedParty, setSelectedParty] = useState<string>('');
+  const [selectedProject, setSelectedProject] = useState<string>('');
   const [systemId, setSystemId] = useState("11111111-1111-1111-1111-111111111112"); // default system id
   const [savedPdfUrl, setSavedPdfUrl] = useState<string | null>(null);
 
@@ -33,6 +39,15 @@ export default function QuotationView() {
     avgPriceWithGst: 0,
     avgPriceWithoutGst: 0,
   });
+
+  useEffect(() => {
+    fetchParties().then(setParties).catch(console.error);
+    fetchProjects().then(setProjects).catch(console.error);
+  }, []);
+
+  const filteredProjects = selectedParty 
+    ? projects.filter(p => p.partyId === selectedParty) 
+    : projects;
 
   useEffect(() => {
     let components = 0;
@@ -96,10 +111,14 @@ export default function QuotationView() {
 
   const handleSaveQuote = async () => {
     if (selectedDesigns.length === 0) return;
+    if (!selectedProject) {
+      alert("Please select a project before saving.");
+      return;
+    }
     setIsSaving(true);
     try {
       const payload = {
-        projectId: "11111111-1111-1111-1111-111111111111", // Default project ID
+        projectId: selectedProject,
         designIds: selectedDesigns.map((d: any) => d.id),
         systemId: systemId,
         ratePerSqFt: selectedDesigns[0]?.sqFtRate || 450,
@@ -148,16 +167,23 @@ export default function QuotationView() {
           </div>
           <div>
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">Party Name</label>
-            <select className={inputClass}>
-              <option>Acme Corp</option>
-              <option>BuildWell Builders</option>
+            <select className={inputClass} value={selectedParty} onChange={(e) => {
+              setSelectedParty(e.target.value);
+              setSelectedProject(''); // Reset project when party changes
+            }}>
+              <option value="" disabled>Select a Party</option>
+              {parties.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
             </select>
           </div>
           <div>
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">Project Name</label>
-            <select className={inputClass}>
-              <option>Acme HQ Renovation</option>
-              <option>Acme Warehouse</option>
+            <select className={inputClass} value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)} disabled={!selectedParty}>
+              <option value="" disabled>Select a Project</option>
+              {filteredProjects.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
             </select>
           </div>
           <div>

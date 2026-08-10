@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from '../ui/input';
+import { fetchProfileSystems } from '@/lib/api';
 
 export interface DesignConfig {
   code: string;
@@ -19,16 +20,19 @@ interface DesignConfiguratorProps {
 }
 
 export function DesignConfigurator({ config, onChange }: DesignConfiguratorProps) {
+  const [profileSystems, setProfileSystems] = useState<any[]>([{ id: 'mock', name: 'VITCO 40MM CASEMENT SERIES' }]);
+
+  useEffect(() => {
+    fetchProfileSystems()
+      .then(data => setProfileSystems(data.length > 0 ? data : profileSystems))
+      .catch(err => console.error("Failed to load profiles:", err));
+  }, []);
+
   const windowTypes = [
     'OPENABLE WINDOW',
     '2trcak 2shutter sliding',
     'FIX WINDOW',
     'Vantilation'
-  ];
-
-  const profileSystems = [
-    'VITCO 40MM CASEMENT SERIES',
-    'VITCO 31MM GULF SLIM SLIDING SERIES'
   ];
 
   const glassOptions = [
@@ -79,16 +83,18 @@ export function DesignConfigurator({ config, onChange }: DesignConfiguratorProps
         </div>
       </div>
 
-      <div className="space-y-1">
-        <label className="text-sm font-medium text-slate-700">Profile System</label>
-        <select 
-          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          value={config.profileSystem}
-          onChange={(e) => onChange({ profileSystem: e.target.value })}
-        >
-          {profileSystems.map(t => <option key={t} value={t}>{t}</option>)}
-        </select>
-      </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-slate-700">Profile System</label>
+          <select 
+            className="w-full h-10 px-3 rounded-md border border-slate-300 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            value={config.profileSystem}
+            onChange={(e) => onChange({ profileSystem: e.target.value })}
+          >
+            {profileSystems.map(system => (
+              <option key={system.id || system.name} value={system.name}>{system.name}</option>
+            ))}
+          </select>
+        </div>
 
       <div className="space-y-1">
         <label className="text-sm font-medium text-slate-700">Glass</label>

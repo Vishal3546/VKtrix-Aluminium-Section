@@ -1,27 +1,57 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Plus, Search, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-
-// Mock Data
-const MOCK_CUSTOMERS = [
-  { id: '1', name: 'TechCorp Inc', phone: '+91 9876543210', gst: '27AADCB2230M1Z2', address: 'Mumbai, Maharashtra', status: 'Active' },
-  { id: '2', name: 'Mr. Sharma', phone: '+91 9988776655', gst: 'Unregistered', address: 'Pune, Maharashtra', status: 'Active' },
-  { id: '3', name: 'City Build Const.', phone: '+91 9123456780', gst: '27BBBCB2230M1Z3', address: 'Thane, Maharashtra', status: 'Inactive' },
-];
+import { fetchParties, createParty } from '@/lib/api';
 
 export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  const [newCustomer, setNewCustomer] = useState({ name: '', type: 'Client', contactInfo: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const filteredCustomers = MOCK_CUSTOMERS.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.phone.includes(searchTerm)
+  const loadCustomers = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchParties();
+      setCustomers(data);
+    } catch (error) {
+      console.error("Failed to load customers:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCustomers();
+  }, []);
+
+  const handleCreateCustomer = async () => {
+    try {
+      setIsSubmitting(true);
+      await createParty(newCustomer);
+      setShowModal(false);
+      setNewCustomer({ name: '', type: 'Client', contactInfo: '' });
+      loadCustomers();
+    } catch (error) {
+      console.error("Failed to create customer:", error);
+      alert("Failed to create customer");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const filteredCustomers = customers.filter(c => 
+    c.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.contactInfo?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -41,7 +71,7 @@ export default function CustomersPage() {
           <div className="flex items-center gap-2">
             <Search className="h-4 w-4 text-muted-foreground" />
             <Input 
-              placeholder="Search customers by name or phone..." 
+              placeholder="Search customers by name or contact info..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm border-0 focus-visible:ring-0 px-0 shadow-none bg-transparent"
@@ -53,30 +83,32 @@ export default function CustomersPage() {
             <TableHeader className="bg-slate-50">
               <TableRow>
                 <TableHead>Customer Name</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>GST Number</TableHead>
-                <TableHead>Address</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Contact Info</TableHead>
+                <TableHead>Type</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCustomers.length === 0 ? (
+              {loading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    No customers found matching "{searchTerm}"
+                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    Loading customers...
+                  </TableCell>
+                </TableRow>
+              ) : filteredCustomers.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                    No customers found
                   </TableCell>
                 </TableRow>
               ) : (
                 filteredCustomers.map((customer) => (
                   <TableRow key={customer.id}>
                     <TableCell className="font-medium">{customer.name}</TableCell>
-                    <TableCell>{customer.phone}</TableCell>
-                    <TableCell className="font-mono text-xs">{customer.gst}</TableCell>
-                    <TableCell className="truncate max-w-[200px]" title={customer.address}>{customer.address}</TableCell>
+                    <TableCell>{customer.contactInfo}</TableCell>
                     <TableCell>
-                      <Badge variant={customer.status === 'Active' ? 'success' : 'secondary'}>
-                        {customer.status}
+                      <Badge variant="secondary">
+                        {customer.type}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -92,7 +124,6 @@ export default function CustomersPage() {
         </CardContent>
       </Card>
 
-      {/* Basic Modal for Add Customer (Mock) */}
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Card className="w-full max-w-md shadow-lg">
@@ -102,27 +133,26 @@ export default function CustomersPage() {
             <CardContent className="space-y-4">
               <div>
                 <label className="text-sm font-medium">Customer Name</label>
-                <Input placeholder="Enter company or person name" className="mt-1" />
+                <Input 
+                  placeholder="Enter company or person name" 
+                  className="mt-1" 
+                  value={newCustomer.name}
+                  onChange={(e) => setNewCustomer({...newCustomer, name: e.target.value})}
+                />
               </div>
               <div>
-                <label className="text-sm font-medium">Phone Number</label>
-                <Input placeholder="+91 XXXXX XXXXX" className="mt-1" />
-              </div>
-              <div>
-                <label className="text-sm font-medium">GSTIN (Optional)</label>
-                <Input placeholder="27XXXXX1234X1ZX" className="mt-1 font-mono uppercase" />
-              </div>
-              <div>
-                <label className="text-sm font-medium">Billing Address</label>
+                <label className="text-sm font-medium">Contact Info (Phone/Email/Address)</label>
                 <textarea 
                   className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" 
                   rows={3}
-                  placeholder="Enter full address"
+                  placeholder="Enter contact details"
+                  value={newCustomer.contactInfo}
+                  onChange={(e) => setNewCustomer({...newCustomer, contactInfo: e.target.value})}
                 />
               </div>
               <div className="flex justify-end gap-2 pt-4 border-t">
-                <Button variant="outline" onClick={() => setShowModal(false)}>Cancel</Button>
-                <Button onClick={() => setShowModal(false)}>Save Customer</Button>
+                <Button variant="outline" onClick={() => setShowModal(false)} disabled={isSubmitting}>Cancel</Button>
+                <Button onClick={handleCreateCustomer} disabled={isSubmitting || !newCustomer.name}>Save Customer</Button>
               </div>
             </CardContent>
           </Card>

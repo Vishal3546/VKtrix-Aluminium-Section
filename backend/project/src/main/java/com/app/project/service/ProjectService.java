@@ -6,17 +6,47 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import com.app.project.dto.ProjectRequest;
+import jakarta.persistence.EntityManager;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final EntityManager entityManager;
 
-    public ProjectService(ProjectRepository projectRepository) {
+    public ProjectService(ProjectRepository projectRepository, EntityManager entityManager) {
         this.projectRepository = projectRepository;
+        this.entityManager = entityManager;
+    }
+
+    public List<Project> getAllProjects() {
+        return projectRepository.findAll();
     }
 
     public List<Project> getProjectsByPartyId(UUID partyId) {
         return projectRepository.findAllByPartyId(partyId);
+    }
+    
+    @Transactional
+    public Project createProject(ProjectRequest request) {
+        List<UUID> tenantIds = entityManager.createNativeQuery("SELECT id FROM tenants LIMIT 1").getResultList();
+        UUID tenantId;
+        if (tenantIds.isEmpty()) {
+            tenantId = UUID.randomUUID();
+            entityManager.createNativeQuery("INSERT INTO tenants (id, name) VALUES (:id, 'Default Tenant')")
+                    .setParameter("id", tenantId)
+                    .executeUpdate();
+        } else {
+            tenantId = (UUID) tenantIds.get(0);
+        }
+        
+        Project project = new Project();
+        project.setTenantId(tenantId);
+        project.setName(request.getName());
+        project.setPartyId(request.getPartyId());
+        project.setStatus(request.getStatus() != null ? request.getStatus() : "New");
+        return projectRepository.save(project);
     }
 }

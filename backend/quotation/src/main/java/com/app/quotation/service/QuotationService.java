@@ -49,6 +49,10 @@ public class QuotationService {
         this.calculationService = calculationService;
     }
 
+    public List<Quotation> getAllQuotations() {
+        return quotationRepository.findAll();
+    }
+
     @Transactional
     public QuotationResponse createQuotation(QuotationRequest request) {
         Quotation quotation = new Quotation();

@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+import com.app.party.dto.PartyRequest;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
 @RestController
 @RequestMapping("/api/v1/parties")
 public class PartyController {
@@ -22,5 +26,10 @@ public class PartyController {
     @GetMapping
     public ResponseEntity<List<Party>> getAllParties() {
         return ResponseEntity.ok(partyService.getAllParties());
+    }
+    
+    @PostMapping
+    public ResponseEntity<Party> createParty(@RequestBody PartyRequest request) {
+        return ResponseEntity.ok(partyService.createParty(request));
     }
 }

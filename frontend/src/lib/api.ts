@@ -6,15 +6,47 @@ export const fetchParties = async () => {
   return response.json();
 };
 
+export const createParty = async (data: any) => {
+  const response = await fetch(`${API_BASE}/v1/parties`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to create party');
+  return response.json();
+};
+
+export const fetchProjects = async () => {
+  const response = await fetch(`${API_BASE}/v1/projects`);
+  if (!response.ok) throw new Error('Failed to fetch projects');
+  return response.json();
+};
+
 export const fetchProjectsByPartyId = async (partyId: string) => {
   const response = await fetch(`${API_BASE}/v1/projects?partyId=${partyId}`);
   if (!response.ok) throw new Error('Failed to fetch projects');
   return response.json();
 };
 
+export const createProject = async (data: any) => {
+  const response = await fetch(`${API_BASE}/v1/projects`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to create project');
+  return response.json();
+};
+
 export const fetchProfileSystems = async () => {
   const response = await fetch(`${API_BASE}/v1/profile-systems`);
   if (!response.ok) throw new Error('Failed to fetch profile systems');
+  return response.json();
+};
+
+export const fetchQuotations = async () => {
+  const response = await fetch(`${API_BASE}/quotations`);
+  if (!response.ok) throw new Error('Failed to fetch quotations');
   return response.json();
 };
 

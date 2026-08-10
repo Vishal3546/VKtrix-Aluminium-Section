@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
+import com.app.project.dto.ProjectRequest;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/v1/projects")
@@ -22,7 +25,15 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Project>> getProjectsByPartyId(@RequestParam("partyId") UUID partyId) {
-        return ResponseEntity.ok(projectService.getProjectsByPartyId(partyId));
+    public ResponseEntity<List<Project>> getProjects(@RequestParam(value = "partyId", required = false) UUID partyId) {
+        if (partyId != null) {
+            return ResponseEntity.ok(projectService.getProjectsByPartyId(partyId));
+        }
+        return ResponseEntity.ok(projectService.getAllProjects());
+    }
+    
+    @PostMapping
+    public ResponseEntity<Project> createProject(@RequestBody ProjectRequest request) {
+        return ResponseEntity.ok(projectService.createProject(request));
     }
 }

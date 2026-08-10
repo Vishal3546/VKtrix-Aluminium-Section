@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { 
@@ -17,12 +17,13 @@ import {
 import { cn } from '@/lib/utils'
 
 const navItems = [
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Party', href: '/customers', icon: Users },
   { name: 'Project', href: '/projects', icon: FolderKanban },
   { name: 'Design', href: '/design', icon: PenTool },
   { name: 'Auto Design', href: '/auto-design', icon: Wand2 },
   { name: 'Quotation', href: '/quotation', icon: FileText },
-  { name: 'Profile', href: '/profile', icon: LayoutDashboard },
+  { name: 'Profile Systems', href: '/profile', icon: Building2 },
   { name: 'History', href: '/history', icon: History },
   { name: 'Company Detail', href: '/company', icon: Building2 },
 ]
@@ -31,10 +32,24 @@ export function Sidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setCollapsed(true)
+      } else {
+        setCollapsed(false)
+      }
+    }
+    // Initialize on mount
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
     <div className={cn(
-      "flex flex-col bg-brand-dark text-white transition-all duration-300 min-h-screen",
-      collapsed ? "w-16" : "w-64"
+      "flex flex-col bg-brand-dark text-white transition-all duration-300 min-h-screen z-50",
+      collapsed ? "w-16" : "w-64 absolute lg:relative"
     )}>
       <div className="flex h-16 items-center justify-between px-4 border-b border-brand-primary/30">
         {!collapsed && (
