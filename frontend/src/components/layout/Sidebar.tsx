@@ -46,6 +46,13 @@ export function Sidebar() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
+  // Collapse sidebar on mobile when navigating to a new page
+  useEffect(() => {
+    if (window.innerWidth < 1024) {
+      setCollapsed(true)
+    }
+  }, [pathname])
+
   return (
     <>
       {/* Mobile overlay */}
