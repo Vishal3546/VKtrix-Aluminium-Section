@@ -47,49 +47,60 @@ export function Sidebar() {
   }, [])
 
   return (
-    <div className={cn(
-      "flex flex-col bg-brand-dark text-white transition-all duration-300 min-h-screen z-50",
-      collapsed ? "w-16" : "w-64 absolute lg:relative"
-    )}>
-      <div className="flex h-16 items-center justify-between px-4 border-b border-brand-primary/30">
-        {!collapsed && (
-          <h1 className="font-bold text-2xl tracking-widest text-white flex items-center">
-            <span className="text-blue-500 text-3xl">h</span>
-            <span className="text-blue-400">A</span>
-            <span className="text-blue-500">Arsh</span>
-          </h1>
-        )}
-        <button 
-          onClick={() => setCollapsed(!collapsed)}
-          className="p-1 hover:bg-brand-primary/50 rounded text-brand-light transition-colors"
-        >
-          <Menu size={20} />
-        </button>
-      </div>
+    <>
+      {/* Mobile overlay */}
+      {!collapsed && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden" 
+          onClick={() => setCollapsed(true)}
+          aria-hidden="true"
+        />
+      )}
       
-      <div className="flex-1 py-4 overflow-y-auto overflow-x-hidden">
-        <nav className="space-y-1 px-2">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
-                  isActive 
-                    ? "bg-brand-primary text-white" 
-                    : "text-brand-light/70 hover:bg-brand-primary/50 hover:text-white"
-                )}
-                title={collapsed ? item.name : undefined}
-              >
-                <item.icon size={20} className="shrink-0" />
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
-            )
-          })}
-        </nav>
+      <div className={cn(
+        "flex flex-col bg-brand-dark text-white transition-all duration-300 min-h-screen z-50",
+        collapsed ? "w-16" : "w-64 absolute lg:relative h-full"
+      )}>
+        <div className="flex h-16 items-center justify-between px-4 border-b border-brand-primary/30">
+          {!collapsed && (
+            <h1 className="font-bold text-2xl tracking-widest text-white flex items-center">
+              <span className="text-blue-500 text-3xl">h</span>
+              <span className="text-blue-400">A</span>
+              <span className="text-blue-500">Arsh</span>
+            </h1>
+          )}
+          <button 
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1 hover:bg-brand-primary/50 rounded text-brand-light transition-colors"
+          >
+            <Menu size={20} />
+          </button>
+        </div>
+        
+        <div className="flex-1 py-4 overflow-y-auto overflow-x-hidden">
+          <nav className="space-y-1 px-2">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
+                    isActive 
+                      ? "bg-brand-primary text-white" 
+                      : "text-brand-light/70 hover:bg-brand-primary/50 hover:text-white"
+                  )}
+                  title={collapsed ? item.name : undefined}
+                >
+                  <item.icon size={20} className="shrink-0" />
+                  {!collapsed && <span>{item.name}</span>}
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
       </div>
-    </div>
+    </>
   )
 }
