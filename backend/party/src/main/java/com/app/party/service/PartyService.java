@@ -28,16 +28,15 @@ public class PartyService {
     @Transactional
     public Party createParty(PartyRequest request) {
         // Fetch or create a default tenant to bypass auth requirement for now
-        @SuppressWarnings("unchecked")
-        List<UUID> tenantIds = (List<UUID>) entityManager.createNativeQuery("SELECT id FROM tenants LIMIT 1").getResultList();
+        List<?> tenantIds = entityManager.createNativeQuery("SELECT CAST(id AS varchar) FROM tenants LIMIT 1").getResultList();
         UUID tenantId;
         if (tenantIds.isEmpty()) {
             tenantId = UUID.randomUUID();
-            entityManager.createNativeQuery("INSERT INTO tenants (id, name) VALUES (:id, 'Default Tenant')")
-                    .setParameter("id", tenantId)
+            entityManager.createNativeQuery("INSERT INTO tenants (id, name) VALUES (CAST(:id AS uuid), 'Default Tenant')")
+                    .setParameter("id", tenantId.toString())
                     .executeUpdate();
         } else {
-            tenantId = (UUID) tenantIds.get(0);
+            tenantId = UUID.fromString(tenantIds.get(0).toString());
         }
         
         Party party = new Party();
