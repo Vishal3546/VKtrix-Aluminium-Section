@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Quotation</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 20mm;
+            @bottom-right {
+                content: "Page " counter(page) " of " counter(pages);
+                font-size: 10px;
+                color: #666;
+            }
+            @bottom-left {
+                content: "Powered by " string(footerBranding);
+                font-size: 10px;
+                color: #666;
+            }
+        }
+        
+        body { 
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
+            font-size: 12px; 
+            color: #333; 
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Utility */
+        .page-break { page-break-before: always; }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .bold { font-weight: bold; }
+        .mt-20 { margin-top: 20px; }
+        .mt-50 { margin-top: 50px; }
+        .mb-20 { margin-bottom: 20px; }
+
+        /* Header */
+        .header { 
+            border-bottom: 2px solid #2E6F40; 
+            padding-bottom: 15px; 
+            margin-bottom: 30px;
+        }
+        .header table { width: 100%; }
+        .header .logo { font-size: 24px; font-weight: bold; color: #2E6F40; }
+        .header .company-details { font-size: 11px; text-align: right; color: #555; }
+        
+        /* Quote Meta */
+        .quote-meta { width: 100%; margin-bottom: 30px; }
+        .quote-meta td { padding: 5px 0; }
+        
+        /* Standard Tables */
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .data-table th, .data-table td { border: 1px solid #ddd; padding: 8px; }
+        .data-table th { background-color: #f8f9fa; font-weight: bold; text-align: left; }
+        
+        /* Window Block */
+        .window-block { margin-bottom: 30px; border: 1px solid #ddd; page-break-inside: avoid; }
+        .window-header { background-color: #2E6F40; color: white; padding: 8px; font-weight: bold; }
+        .window-body { padding: 15px; }
+        .window-top-grid { width: 100%; margin-bottom: 15px; }
+        .window-top-grid td { vertical-align: top; width: 50%; }
+        .diagram-box { border: 1px dashed #ccc; height: 150px; text-align: center; color: #999; line-height: 150px; }
+        .split-grid { width: 100%; border-collapse: collapse; }
+        .split-grid td { width: 50%; vertical-align: top; padding: 0 10px; }
+        .split-grid td:first-child { border-right: 1px solid #ddd; padding-left: 0; }
+        .split-grid td:last-child { padding-right: 0; }
+        
+        /* Summary Table */
+        .summary-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .summary-table th, .summary-table td { padding: 10px; border-bottom: 1px solid #ddd; }
+        .summary-table th { text-align: left; background-color: #f8f9fa; width: 60%; }
+        .summary-table td { text-align: right; font-weight: bold; }
+        .summary-total { font-size: 14px; background-color: #e2f0e5 !important; }
+        
+        /* T&C */
+        .rich-text { font-size: 12px; line-height: 1.6; }
+        
+        /* Signatures */
+        .signatures { width: 100%; margin-top: 80px; }
+        .signatures td { text-align: center; border-top: 1px solid #333; padding-top: 10px; width: 40%; }
+        .signatures .spacer { border: none; width: 20%; }
+    </style>
+</head>
+<body>
+
+<!-- Setup Footer Branding Variable -->
+<div style="display: none; string-set: footerBranding attr(data-branding);" th:attr="data-branding=${tenantBranding}"></div>
+
+<!-- PAGE 1: COVER LETTER -->
+<div class="header">
+    <table>
+        <tr>
+            <td class="logo">Aluminium Section SaaS</td>
+            <td class="company-details">
+                123 Industrial Estate, Phase 4<br/>
+                Andheri East, Mumbai 400069<br/>
+                GSTIN: 27AABCU9603R1ZM<br/>
+                contact@aluminiumsaas.com | +91 98765 43210
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table class="quote-meta">
+    <tr>
+        <td style="width: 15%;"><strong>Quotation No:</strong></td>
+        <td style="width: 35%;" th:text="${quotationNumber}">Q-2026-001</td>
+        <td style="width: 15%;" class="text-right"><strong>Date:</strong></td>
+        <td style="width: 35%;" class="text-right" th:text="${date}">2026-10-27</td>
+    </tr>
+    <tr>
+        <td><strong>Project:</strong></td>
+        <td th:text="${projectName}">Residential Villa</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><strong>Customer:</strong></td>
+        <td th:text="${customerName}">Mr. Sharma</td>
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+
+<div class="mt-20">
+    <p>Dear Sir/Madam,</p>
+    <p>We thank you for your enquiry and are pleased to submit our most competitive quotation for the supply and installation of Aluminium Fenestration Systems for your esteemed project. Our systems are engineered using high-grade aluminium profiles and premium accessories to ensure durability and aesthetic appeal.</p>
+    <p>Please find the detailed room-wise breakdown and specifications enclosed in the subsequent pages.</p>
+    <p class="mt-50">Assuring you of our best services at all times.</p>
+    
+    <p class="mt-50 bold">For Aluminium Section SaaS,</p>
+    <p class="mt-50">Authorized Signatory</p>
+</div>
+
+<!-- PAGE 2+: PER-WINDOW BREAKDOWN -->
+<div class="page-break">
+    <h2 style="color: #2E6F40; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Design Breakdown</h2>
+    
+    <div class="window-block" th:each="item : ${items}">
+        <div class="window-header">
+            <span th:text="${item.code}">W-01</span> : <span th:text="${item.name}">Casement Window</span>
+        </div>
+        <div class="window-body">
+            <table class="window-top-grid">
+                <tr>
+                    <td>
+                        <p><strong>System:</strong> <span th:text="${item.profileSystem}">Domal 40mm</span></p>
+                        <p><strong>Size:</strong> <span th:text="${item.width} + ' W x ' + ${item.height} + ' H (mm)'">1200 W x 1500 H</span></p>
+                        <p><strong>Glass Spec:</strong> <span th:text="${item.glassSpec}">(1) 5mm Clear Toughened</span></p>
+                        <p><strong>Location:</strong> <span th:text="${item.location}">Master Bedroom</span></p>
+                        
+                        <table class="data-table mt-20" style="width: 90%;">
+                            <tr><th>Total Area</th><td th:text="${#numbers.formatDecimal(item.sqFt, 1, 2)} + ' Sq.Ft'">19.38 Sq.Ft</td></tr>
+                            <tr><th>Qty</th><td th:text="${item.qty}">1</td></tr>
+                            <tr><th>Unit Price</th><td th:text="'₹ ' + ${#numbers.formatDecimal(item.unitPrice, 1, 2)}">₹ 12,000.00</td></tr>
+                            <tr><th>Est. Weight</th><td th:text="${#numbers.formatDecimal(item.weightKg, 1, 2)} + ' KG'">15.4 KG</td></tr>
+                            <tr style="background: #f8f9fa;"><th><strong>Total Value</strong></th><td><strong th:text="'₹ ' + ${#numbers.formatDecimal(item.value, 1, 2)}">₹ 12,000.00</strong></td></tr>
+                        </table>
+                    </td>
+                    <td>
+                        <div class="diagram-box">
+                            <span th:if="${item.imageUrl == null}">[ View From Inside - 2D Diagram ]</span>
+                            <img th:if="${item.imageUrl != null}" th:src="${item.imageUrl}" style="max-width:100%; max-height: 100%;" />
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+            <table class="split-grid mt-20">
+                <tr>
+                    <td>
+                        <strong>Profile Breakdown</strong>
+                        <table class="data-table mt-20" style="font-size: 10px;">
+                            <thead>
+                                <tr><th>Section Type</th><th>Code</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="profile : ${item.profiles}">
+                                    <td th:text="${profile.type}">Outer Frame</td>
+                                    <td th:text="${profile.code}">V-4034</td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(item.profiles)}">
+                                    <td colspan="2" class="text-center text-muted">No profiles defined</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        <strong>Sash Accessories</strong>
+                        <div th:each="sash : ${item.sashes}" class="mt-20">
+                            <span class="bold" th:text="${sash.name}">Sash 1</span>
+                            <table class="data-table" style="font-size: 10px; margin-top: 5px;">
+                                <thead>
+                                    <tr><th>Accessory</th><th>Qty</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="acc : ${sash.accessories}">
+                                        <td th:text="${acc.name}">Touch Lock</td>
+                                        <td th:text="${acc.qty}">1</td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(sash.accessories)}">
+                                        <td colspan="2" class="text-center text-muted">No accessories</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div th:if="${#lists.isEmpty(item.sashes)}" class="mt-20 text-muted" style="font-size: 10px;">
+                            No sashes defined.
+                        </div>
+                    </td>
+                </tr>
+            </table>
+            
+            <p class="mt-20" style="font-size: 11px;"><strong>Remarks:</strong> <span th:text="${item.remarks}">Standard finish.</span></p>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 3: QUOTE TOTALS -->
+<div class="page-break">
+    <h2 style="color: #2E6F40; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Commercial Summary</h2>
+    
+    <table class="summary-table">
+        <tr>
+            <th>Total No. of Components</th>
+            <td th:text="${totalComponents}">5</td>
+        </tr>
+        <tr>
+            <th>Total Area (Sq.Ft)</th>
+            <td th:text="${#numbers.formatDecimal(totalAreaSqFt, 1, 2)}">150.50</td>
+        </tr>
+        <tr>
+            <th>Basic Value</th>
+            <td th:text="'₹ ' + ${#numbers.formatDecimal(basicValue, 1, 2)}">₹ 150,000.00</td>
+        </tr>
+        <tr>
+            <th>Discount (<span th:text="${#numbers.formatDecimal(discountPercent, 1, 1)}">5.0</span>%)</th>
+            <td th:text="'- ₹ ' + ${#numbers.formatDecimal(discountValue, 1, 2)}">- ₹ 7,500.00</td>
+        </tr>
+        <tr>
+            <th>Sub Total</th>
+            <td th:text="'₹ ' + ${#numbers.formatDecimal(subTotal, 1, 2)}">₹ 142,500.00</td>
+        </tr>
+        <tr>
+            <th>Transportation Cost</th>
+            <td th:text="'+ ₹ ' + ${#numbers.formatDecimal(transportationCost, 1, 2)}">+ ₹ 2,000.00</td>
+        </tr>
+        <tr>
+            <th>Loading &amp; Unloading</th>
+            <td th:text="'+ ₹ ' + ${#numbers.formatDecimal(loadingCost, 1, 2)}">+ ₹ 1,000.00</td>
+        </tr>
+        <tr style="background-color: #f0f0f0;">
+            <th>Total Project Cost</th>
+            <td th:text="'₹ ' + ${#numbers.formatDecimal(totalProjectCost, 1, 2)}">₹ 145,500.00</td>
+        </tr>
+        <tr>
+            <th>GST (<span th:text="${#numbers.formatDecimal(gstPercent, 1, 1)}">18.0</span>%)</th>
+            <td th:text="'+ ₹ ' + ${#numbers.formatDecimal(gstValue, 1, 2)}">+ ₹ 26,190.00</td>
+        </tr>
+        <tr class="summary-total">
+            <th>GRAND TOTAL</th>
+            <td th:text="'₹ ' + ${#numbers.formatDecimal(grandTotal, 1, 2)}">₹ 171,690.00</td>
+        </tr>
+    </table>
+    
+    <p class="text-right mt-20" style="color: #666;">Average Price per Sq.Ft (Excl. GST): <strong th:text="'₹ ' + ${#numbers.formatDecimal(avgPriceExcl, 1, 2)}">₹ 966.77</strong></p>
+    <p class="text-right" style="color: #666;">Average Price per Sq.Ft (Incl. GST): <strong th:text="'₹ ' + ${#numbers.formatDecimal(avgPriceIncl, 1, 2)}">₹ 1140.80</strong></p>
+</div>
+
+<!-- PAGE 4: TERMS & CONDITIONS -->
+<div class="page-break" th:if="${termsAndConditions != null}">
+    <h2 style="color: #2E6F40; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Terms &amp; Conditions</h2>
+    <div class="rich-text mt-20" th:utext="${termsAndConditions}">
+        <!-- Populated via Tenant Config -->
+    </div>
+</div>
+
+<!-- PAGE 5: PRE-REQUISITES & SIGNATURES -->
+<div class="page-break">
+    <h2 th:if="${preRequisites != null}" style="color: #2E6F40; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Pre-Requisites for Installation</h2>
+    <div th:if="${preRequisites != null}" class="rich-text mt-20" th:utext="${preRequisites}">
+        <!-- Populated via Tenant Config -->
+    </div>
+
+    <table class="signatures">
+        <tr>
+            <td>Authorized Signatory</td>
+            <td class="spacer"></td>
+            <td>Signature of Customer</td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>
