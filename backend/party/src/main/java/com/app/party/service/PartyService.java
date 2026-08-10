@@ -28,7 +28,8 @@ public class PartyService {
     @Transactional
     public Party createParty(PartyRequest request) {
         // Fetch or create a default tenant to bypass auth requirement for now
-        List<UUID> tenantIds = entityManager.createNativeQuery("SELECT id FROM tenants LIMIT 1").getResultList();
+        @SuppressWarnings("unchecked")
+        List<UUID> tenantIds = (List<UUID>) entityManager.createNativeQuery("SELECT id FROM tenants LIMIT 1").getResultList();
         UUID tenantId;
         if (tenantIds.isEmpty()) {
             tenantId = UUID.randomUUID();
