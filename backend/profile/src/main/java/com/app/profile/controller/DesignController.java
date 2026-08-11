@@ -6,7 +6,6 @@ import com.app.profile.dto.AutoDesignRequest;
 import com.app.profile.dto.DesignResponse;
 import com.app.profile.service.DesignService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("profileDesignController")
