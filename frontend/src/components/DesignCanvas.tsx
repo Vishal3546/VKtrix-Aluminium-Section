@@ -8,6 +8,7 @@ const DesignCanvasCore = dynamic(() => import('./DesignCanvasCore'), { ssr: fals
 interface Props {
   design: DesignData;
   onUpdatePanel: (panelId: string, updates: Partial<DesignPanel>) => void;
+  onUpdateDesign?: (newDesign: DesignData) => void;
 }
 
 export default function DesignCanvas(props: Props) {

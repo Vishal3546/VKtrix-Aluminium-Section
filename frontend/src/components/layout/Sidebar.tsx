@@ -71,9 +71,9 @@ export function Sidebar() {
         <div className="flex h-16 items-center justify-between px-4 border-b border-brand-primary/30">
           {!collapsed && (
             <h1 className="font-bold text-2xl tracking-widest text-white flex items-center">
-              <span className="text-blue-500 text-3xl">h</span>
-              <span className="text-blue-400">A</span>
-              <span className="text-blue-500">Arsh</span>
+              <span className="text-blue-500 text-3xl">V</span>
+              <span className="text-blue-400">K</span>
+              <span className="text-blue-500">trix</span>
             </h1>
           )}
           <button 

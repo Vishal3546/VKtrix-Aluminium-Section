@@ -58,10 +58,20 @@ public class QuotationService {
         Quotation quotation = new Quotation();
         quotation.setTenantId(DEFAULT_TENANT_ID);
         quotation.setProjectId(request.getProjectId());
+        quotation.setPartyId(request.getPartyId());
         quotation.setStatus("DRAFT");
         
         String quoteNo = "Q-" + System.currentTimeMillis();
         quotation.setQuotationNumber(quoteNo);
+
+        LocalDate qDate = request.getQuotationDate() != null ? request.getQuotationDate() : LocalDate.now();
+        quotation.setQuotationDate(qDate);
+
+        LocalDate vUntil = request.getValidUntil() != null ? request.getValidUntil() : qDate.plusDays(30);
+        quotation.setValidUntil(vUntil);
+
+        quotation.setPricingTier(request.getPricingTier() != null ? request.getPricingTier() : "Standard");
+        quotation.setNotes(request.getNotes());
 
         BigDecimal totalAmount = BigDecimal.ZERO;
         List<Map<String, Object>> templateItems = new ArrayList<>();
@@ -165,9 +175,12 @@ public class QuotationService {
         }
 
         variables.put("quotationNumber", quoteNo);
-        variables.put("date", LocalDate.now().toString());
+        variables.put("date", qDate.toString());
+        variables.put("validUntil", vUntil.toString());
+        variables.put("pricingTier", quotation.getPricingTier());
+        variables.put("notes", quotation.getNotes());
         variables.put("projectName", "Project ID: " + request.getProjectId());
-        variables.put("customerName", "Client (ID: " + request.getProjectId() + ")");
+        variables.put("customerName", "Client (ID: " + request.getPartyId() + ")");
         variables.put("items", templateItems);
         
         variables.put("totalComponents", templateItems.size());

@@ -1,18 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { mockSavedDesigns } from '@/lib/mockApi';
+import { DesignQueueItem } from '@/components/AutoDesignForm';
 
 interface VerifyQuoteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (selectedRows: any[]) => void;
+  queue?: DesignQueueItem[];
 }
 
-export default function VerifyQuoteModal({ isOpen, onClose, onConfirm }: VerifyQuoteModalProps) {
-  const [rows, setRows] = useState(mockSavedDesigns.map(r => ({ ...r, checked: false })));
+export default function VerifyQuoteModal({ isOpen, onClose, onConfirm, queue = [] }: VerifyQuoteModalProps) {
+  const [rows, setRows] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setRows(queue.map(q => ({
+        id: q.id,
+        sr: q.sr,
+        designName: q.designCode,
+        shortDescription: `${q.widthMm}x${q.heightMm} mm`,
+        widthMm: q.widthMm,
+        heightMm: q.heightMm,
+        profileSystem: "Custom System",
+        glass: "Standard Glass",
+        fittings: "Standard Fittings",
+        qty: 1,
+        sqFtRate: 450,
+        thumbnail: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2VlZSIvPjwvc3ZnPg==",
+        checked: true
+      })));
+    }
+  }, [isOpen, queue]);
 
   if (!isOpen) return null;
 

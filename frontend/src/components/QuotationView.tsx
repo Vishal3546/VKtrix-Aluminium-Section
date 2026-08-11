@@ -8,8 +8,9 @@ import { Save, Printer, Settings2, Calculator } from 'lucide-react';
 import VerifyQuoteModal from './VerifyQuoteModal';
 import ExpensesTaxPanel from './ExpensesTaxPanel';
 import { fetchParties, fetchProjects } from '@/lib/api';
+import { DesignQueueItem } from './AutoDesignForm';
 
-export default function QuotationView() {
+export default function QuotationView({ queue = [] }: { queue?: DesignQueueItem[] }) {
   const [selectedDesigns, setSelectedDesigns] = useState<any[]>([]);
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [isTaxPanelOpen, setIsTaxPanelOpen] = useState(false);
@@ -21,6 +22,10 @@ export default function QuotationView() {
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [systemId, setSystemId] = useState("11111111-1111-1111-1111-111111111112"); // default system id
   const [savedPdfUrl, setSavedPdfUrl] = useState<string | null>(null);
+
+  const [quotationDate, setQuotationDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [pricingTier, setPricingTier] = useState<string>('Standard');
+  const [notes, setNotes] = useState<string>('');
 
   const [discountPct, setDiscountPct] = useState<number>(0);
   const [transportCost, setTransportCost] = useState<number>(0);
@@ -119,13 +124,17 @@ export default function QuotationView() {
     try {
       const payload = {
         projectId: selectedProject,
+        partyId: selectedParty,
         designIds: selectedDesigns.map((d: any) => d.id),
         systemId: systemId,
         ratePerSqFt: selectedDesigns[0]?.sqFtRate || 450,
         discountPercent: discountPct,
         transportationCost: transportCost,
         loadingUnloadingCost: loadingCost,
-        gstPercent: gstPct
+        gstPercent: gstPct,
+        quotationDate: quotationDate,
+        pricingTier: pricingTier,
+        notes: notes
       };
 
       const res = await fetch("http://localhost:8080/api/quotations/generate", {
@@ -159,7 +168,7 @@ export default function QuotationView() {
         <CardContent className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
           <div>
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">Date</label>
-            <Input type="date" className={inputClass} defaultValue={new Date().toISOString().split('T')[0]} />
+            <Input type="date" className={inputClass} value={quotationDate} onChange={(e) => setQuotationDate(e.target.value)} />
           </div>
           <div>
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">Quotation No.</label>
@@ -195,13 +204,19 @@ export default function QuotationView() {
           </div>
           <div>
             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1 block">Pricing Tier</label>
-            <select className={inputClass}>
-              <option>Standard</option>
-              <option>Premium</option>
+            <select className={inputClass} value={pricingTier} onChange={(e) => setPricingTier(e.target.value)}>
+              <option value="Standard">Standard</option>
+              <option value="Premium">Premium</option>
             </select>
           </div>
           <div>
-            <Button variant="outline" className="w-full bg-white">
+            <Button variant="outline" className="w-full bg-white" onClick={() => {
+              const rate = prompt("Enter new default Rate per SqFt for all items:", "450");
+              if (rate && !isNaN(Number(rate))) {
+                const newRate = Number(rate);
+                setSelectedDesigns(prev => prev.map(d => ({ ...d, sqFtRate: newRate })));
+              }
+            }}>
               <Calculator className="w-4 h-4 mr-2" /> Costing Rate
             </Button>
           </div>
@@ -210,6 +225,21 @@ export default function QuotationView() {
               <Settings2 className="w-5 h-5 mr-2" /> Click To Generate
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Notes Section */}
+      <Card className="shadow-sm">
+        <CardHeader className="bg-white border-b py-4">
+          <CardTitle className="text-lg">Terms & Conditions / Notes</CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <textarea 
+            className="w-full min-h-[80px] p-3 rounded-md border border-input bg-background text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            placeholder="Add custom notes, validity, or payment terms for this quotation..."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          ></textarea>
         </CardContent>
       </Card>
 
@@ -298,6 +328,7 @@ export default function QuotationView() {
         isOpen={isVerifyModalOpen} 
         onClose={() => setIsVerifyModalOpen(false)} 
         onConfirm={handleGenerateConfirm} 
+        queue={queue}
       />
 
       <ExpensesTaxPanel 

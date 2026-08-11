@@ -13,13 +13,13 @@ export default function QuotationPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Keep the queue for the PDF Template which hasn't been rewritten yet to use the new mockSavedDesigns.
-    const saved = localStorage.getItem('quotation_queue');
+    // Load designs generated from Auto Design page
+    const saved = localStorage.getItem('autoDesignQueue');
     if (saved) {
       try {
         setQueue(JSON.parse(saved));
       } catch (e) {
-        console.error('Failed to parse cached quotation_queue', e);
+        console.error('Failed to parse cached autoDesignQueue', e);
       }
     }
     setTimeout(() => setIsLoading(false), 300);
@@ -51,7 +51,7 @@ export default function QuotationPage() {
           </div>
         </div>
 
-        <QuotationView />
+        <QuotationView queue={queue} />
       </div>
 
       {/* Hidden Print Wrapper for Detailed Design PDF */}

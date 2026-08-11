@@ -27,6 +27,10 @@ export default function DesignCanvasModal({ isOpen, onClose, queueItem, onUpdate
     onUpdateLayout(queueItem.id, newDesign);
   };
 
+  const handleUpdateDesign = (newDesign: DesignData) => {
+    onUpdateLayout(queueItem.id, newDesign);
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 items-center justify-between border-b px-6 bg-background shadow-sm">
@@ -43,7 +47,7 @@ export default function DesignCanvasModal({ isOpen, onClose, queueItem, onUpdate
       
       <div className="flex-1 overflow-auto bg-muted/20 p-6">
         <div className="mx-auto max-w-5xl bg-background rounded-xl shadow-sm border p-4">
-          <DesignCanvas design={design} onUpdatePanel={handleUpdatePanel} />
+          <DesignCanvas design={design} onUpdatePanel={handleUpdatePanel} onUpdateDesign={handleUpdateDesign} />
         </div>
       </div>
     </div>

@@ -39,9 +39,10 @@ export type DesignData = {
 interface Props {
   design: DesignData;
   onUpdatePanel: (panelId: string, updates: Partial<DesignPanel>) => void;
+  onUpdateDesign?: (newDesign: DesignData) => void;
 }
 
-export default function DesignCanvasCore({ design, onUpdatePanel }: Props) {
+export default function DesignCanvasCore({ design, onUpdatePanel, onUpdateDesign }: Props) {
   const stageRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
@@ -49,7 +50,7 @@ export default function DesignCanvasCore({ design, onUpdatePanel }: Props) {
   const [selectedPanelId, setSelectedPanelId] = useState<string | null>(null);
   const [clickedFrameEdge, setClickedFrameEdge] = useState(false);
   
-  const [containerWidth, setContainerWidth] = useState(600);
+  const [containerSize, setContainerSize] = useState({ width: 600, height: 400 });
   const [isSaving, setIsSaving] = useState(false);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState(false);
   const [thumbnailDataUrl, setThumbnailDataUrl] = useState<string | null>(null);
@@ -69,18 +70,30 @@ export default function DesignCanvasCore({ design, onUpdatePanel }: Props) {
     if (!containerRef.current) return;
     const observer = new ResizeObserver((entries) => {
       for (let entry of entries) {
-        setContainerWidth(entry.contentRect.width);
+        setContainerSize({ 
+          width: entry.contentRect.width,
+          height: entry.contentRect.height 
+        });
       }
     });
     observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, []);
 
-  // Use a fixed scale or dynamic
-  const SCALE = Math.min(containerWidth, 800) / Math.max(activeDesign.widthMm, 100);
+  const padding = 60; // For dimensions
+  
+  // Dynamic scale to fit container width AND height
+  const availableWidth = Math.max(containerSize.width - (padding * 2) - 40, 100);
+  const availableHeight = Math.max(containerSize.height - (padding * 2) - 40, 100);
+  
+  const scaleX = availableWidth / Math.max(activeDesign.widthMm, 100);
+  const scaleY = availableHeight / Math.max(activeDesign.heightMm, 100);
+  
+  // Use fixed maximum scale so it doesn't blow up too large for tiny items
+  const SCALE = Math.min(scaleX, scaleY, 0.8); 
+  
   const stageWidth = activeDesign.widthMm * SCALE;
   const stageHeight = activeDesign.heightMm * SCALE;
-  const padding = 60; // For dimensions
 
   const handleExport = () => {
     if (stageRef.current) {
@@ -117,6 +130,19 @@ export default function DesignCanvasCore({ design, onUpdatePanel }: Props) {
       handleSave();
       return;
     }
+    
+    if (tool === 'CASHMEN_WINDOW') {
+      handleTemplateSelect('1-Door Casement');
+      setActiveTool('FRAME');
+      return;
+    }
+    
+    if (tool === 'SLIDER_WINDOW') {
+      handleTemplateSelect('2-Slider');
+      setActiveTool('FRAME');
+      return;
+    }
+
     setActiveTool(tool);
     // Reset selections on tool change
     setSelectedPanelId(null);
@@ -214,15 +240,19 @@ export default function DesignCanvasCore({ design, onUpdatePanel }: Props) {
       });
     }
 
-    setActiveDesign({
+    const newDesign = {
       ...activeDesign,
       gridCols: cols,
       layoutType: 'GRID',
       panels: newPanels
-    });
+    };
+    
+    setActiveDesign(newDesign);
     
     // Auto-save the new layout
-    newPanels.forEach(p => onUpdatePanel(p.id, p));
+    if (onUpdateDesign) {
+      onUpdateDesign(newDesign);
+    }
   };
 
   const renderRightPanel = () => {
@@ -244,37 +274,36 @@ export default function DesignCanvasCore({ design, onUpdatePanel }: Props) {
         {/* 2. Middle Canvas Area */}
         <div className="flex-1 flex flex-col relative bg-slate-50">
           
-          {/* AI Auto-Designer Bar (2026 Glassmorphism Style) */}
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-[600px]">
-            <div className="backdrop-blur-md bg-white/70 border border-white/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-full p-2 flex items-center gap-2 transition-all hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]">
+          <div className="absolute top-4 left-4 z-10 flex gap-2 w-full max-w-sm xl:max-w-[500px]">
+            <div className="backdrop-blur-md bg-white/70 border border-white/50 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)] rounded-full p-2 flex items-center gap-2 transition-all hover:shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] w-full">
                <div className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full p-2 ml-1">
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
                </div>
                <input 
-                 className="flex-1 bg-transparent outline-none px-2 text-sm text-slate-700 placeholder:text-slate-400 font-medium" 
-                 placeholder="Ask AI e.g. 'Create a 3000x3000 4-Slider for Bedroom'"
+                 className="flex-1 bg-transparent outline-none px-2 text-sm text-slate-700 placeholder:text-slate-400 font-medium w-full" 
+                 placeholder="Ask AI e.g. 'Create a 3000x3000 4-Slider'"
                  value={aiPrompt}
                  onChange={e => setAiPrompt(e.target.value)}
                  onKeyDown={e => e.key === 'Enter' && handleAiGenerate()}
                />
-               <Button size="sm" className="rounded-full px-6 bg-slate-900 hover:bg-slate-800" onClick={handleAiGenerate} disabled={isAiGenerating}>
-                 {isAiGenerating ? 'Generating...' : 'Generate'}
+               <Button size="sm" className="rounded-full px-4 xl:px-6 bg-slate-900 hover:bg-slate-800" onClick={handleAiGenerate} disabled={isAiGenerating}>
+                 {isAiGenerating ? '...' : 'Gen'}
                </Button>
             </div>
           </div>
 
           <div className="absolute top-4 right-4 z-10 flex gap-2">
             <Button variant="outline" size="sm" onClick={handleExport} className="bg-white/80 backdrop-blur-sm border-slate-200">
-              <Download className="h-4 w-4 mr-2" /> Export
+              <Download className="h-4 w-4 mr-2 hidden sm:block" /> Export
             </Button>
             <Button variant="default" size="sm" onClick={handleSave} className="bg-brand-primary shadow-lg shadow-brand-primary/20">
-              <Save className="h-4 w-4 mr-2" /> {isSaving ? 'Saving...' : 'Save Design'}
+              <Save className="h-4 w-4 mr-2 hidden sm:block" /> {isSaving ? 'Saving...' : 'Save'}
             </Button>
           </div>
 
-          <div className="flex-1 overflow-auto p-8 flex items-center justify-center" ref={containerRef}>
-            {containerWidth > 0 && (
-              <div className="relative shadow-md bg-white p-[60px]" style={{ width: stageWidth + padding*2, height: stageHeight + padding*2 }}>
+          <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-slate-100" ref={containerRef}>
+            {containerSize.width > 0 && (
+              <div className="relative shadow-md bg-white border border-slate-200" style={{ width: stageWidth + padding*2, height: stageHeight + padding*2, padding: padding }}>
                 
                 {/* Drum Dimension Labels (Top & Left) */}
                 <div className="absolute top-0 left-[60px] h-[60px] flex items-center justify-center border-b border-dashed border-slate-300" style={{ width: stageWidth }}>
@@ -302,7 +331,15 @@ export default function DesignCanvasCore({ design, onUpdatePanel }: Props) {
                     {/* Inner Panels/Mullions */}
                     {activeDesign.panels.map((panel) => {
                       const isSelected = selectedPanelId === panel.id;
-                      const x = (panel.x || 0) * SCALE;
+                      
+                      // Calculate fallback X position if missing
+                      let panelX = panel.x;
+                      if (panelX === undefined || panelX === null) {
+                        const defaultW = activeDesign.widthMm / (activeDesign.gridCols || 1);
+                        panelX = ((panel.panelIndex || 1) - 1) * defaultW;
+                      }
+                      
+                      const x = panelX * SCALE;
                       const y = (panel.y || 0) * SCALE;
                       const w = panel.widthMm * SCALE;
                       const h = panel.heightMm * SCALE;

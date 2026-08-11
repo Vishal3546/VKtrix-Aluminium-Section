@@ -3,9 +3,11 @@ package com.app.quotation.dto;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDate;
 
 public class QuotationRequest {
     private UUID projectId;
+    private UUID partyId;
     private List<UUID> designIds;
     private UUID systemId;
     private BigDecimal ratePerSqFt;
@@ -40,4 +42,24 @@ public class QuotationRequest {
 
     public BigDecimal getGstPercent() { return gstPercent; }
     public void setGstPercent(BigDecimal gstPercent) { this.gstPercent = gstPercent; }
+
+    private LocalDate quotationDate;
+    private LocalDate validUntil;
+    private String pricingTier;
+    private String notes;
+
+    public UUID getPartyId() { return partyId; }
+    public void setPartyId(UUID partyId) { this.partyId = partyId; }
+
+    public LocalDate getQuotationDate() { return quotationDate; }
+    public void setQuotationDate(LocalDate quotationDate) { this.quotationDate = quotationDate; }
+
+    public LocalDate getValidUntil() { return validUntil; }
+    public void setValidUntil(LocalDate validUntil) { this.validUntil = validUntil; }
+
+    public String getPricingTier() { return pricingTier; }
+    public void setPricingTier(String pricingTier) { this.pricingTier = pricingTier; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 }

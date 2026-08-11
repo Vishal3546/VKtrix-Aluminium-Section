@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
+import java.time.LocalDate;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.TenantId;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -22,6 +23,21 @@ public class Quotation {
 
     @Column(name = "project_id", nullable = false)
     private UUID projectId;
+
+    @Column(name = "party_id")
+    private UUID partyId;
+
+    @Column(name = "quotation_date")
+    private LocalDate quotationDate;
+
+    @Column(name = "valid_until")
+    private LocalDate validUntil;
+
+    @Column(name = "pricing_tier", length = 50)
+    private String pricingTier;
+
+    @Column(name = "notes", length = 2000)
+    private String notes;
 
     @Column(name = "total_amount", precision = 15, scale = 2)
     private BigDecimal totalAmount;
@@ -95,4 +111,19 @@ public class Quotation {
 
     public String getPdfUrl() { return pdfUrl; }
     public void setPdfUrl(String pdfUrl) { this.pdfUrl = pdfUrl; }
+
+    public UUID getPartyId() { return partyId; }
+    public void setPartyId(UUID partyId) { this.partyId = partyId; }
+
+    public LocalDate getQuotationDate() { return quotationDate; }
+    public void setQuotationDate(LocalDate quotationDate) { this.quotationDate = quotationDate; }
+
+    public LocalDate getValidUntil() { return validUntil; }
+    public void setValidUntil(LocalDate validUntil) { this.validUntil = validUntil; }
+
+    public String getPricingTier() { return pricingTier; }
+    public void setPricingTier(String pricingTier) { this.pricingTier = pricingTier; }
+
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 }
