@@ -27,7 +27,7 @@ public class DesignService {
     private final FormulaEngineService formulaEngineService;
 
     // Hardcoded for testing since authentication context isn't provided
-    private final UUID DEFAULT_TENANT_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    private final UUID DEFAULT_TENANT_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     public DesignService(DesignRepository designRepository, DesignPanelRepository designPanelRepository, FormulaEngineService formulaEngineService) {
         this.designRepository = designRepository;
@@ -127,6 +127,9 @@ public class DesignService {
         design.setGridRows(1);
         Integer shutterCount = request.getShutterCount();
         design.setGridCols(shutterCount != null ? shutterCount : 1);
+        design.setProjectId(request.getProjectId());
+        design.setName(request.getType() != null ? request.getType() + " Design" : "Auto Generated Design");
+        design.setSystemId(request.getProfileSystemId());
         
         // You would typically link the partyId and projectId to this design in a real system
         // But for now we just process the design panels.

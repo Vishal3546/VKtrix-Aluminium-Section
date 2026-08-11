@@ -30,6 +30,8 @@ public class SecurityConfig {
                     new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/public/**"),
                     new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/v1/**"),
                     new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/designs/**"),
+                    new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/designs/**"),
+                    new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/api/quotations/**"),
                     new org.springframework.security.web.util.matcher.AntPathRequestMatcher("/error")
                 ).permitAll()
                 .anyRequest().authenticated()

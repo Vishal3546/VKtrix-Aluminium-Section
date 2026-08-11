@@ -19,6 +19,15 @@ public class Design {
     @Column(name = "tenant_id")
     private UUID tenantId;
 
+    @Column(name = "project_id")
+    private UUID projectId;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "system_id")
+    private UUID systemId;
+
     @Column(name = "width_mm", nullable = false)
     private Double widthMm;
 
@@ -58,6 +67,15 @@ public class Design {
 
     public UUID getTenantId() { return tenantId; }
     public void setTenantId(UUID tenantId) { this.tenantId = tenantId; }
+
+    public UUID getProjectId() { return projectId; }
+    public void setProjectId(UUID projectId) { this.projectId = projectId; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public UUID getSystemId() { return systemId; }
+    public void setSystemId(UUID systemId) { this.systemId = systemId; }
 
     public Double getWidthMm() { return widthMm; }
     public void setWidthMm(Double widthMm) { this.widthMm = widthMm; }

@@ -31,7 +31,7 @@ public class QuotationService {
     private final CalculationService calculationService;
 
     // Default tenant for testing
-    private final UUID DEFAULT_TENANT_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    private final UUID DEFAULT_TENANT_ID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     public QuotationService(QuotationRepository quotationRepository, 
                             QuotationItemRepository quotationItemRepository,

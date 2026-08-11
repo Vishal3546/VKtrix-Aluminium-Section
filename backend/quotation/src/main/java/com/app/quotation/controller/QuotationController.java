@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/quotations")
-@PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'ACCOUNTS')")
+// @PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'ACCOUNTS')")
 public class QuotationController {
 
     private final QuotationService quotationService;

@@ -1,0 +1,1 @@
+import net.objecthunter.exp4j.*; import java.util.*; public class TestExp4j { public static void main(String[] args) { ExpressionBuilder b = new ExpressionBuilder("0"); b.variables("W", "H"); try { Expression e = b.build(); e.setVariable("W", 100); e.setVariable("H", 200); System.out.println(e.evaluate()); } catch(Exception ex) { ex.printStackTrace(); } } }

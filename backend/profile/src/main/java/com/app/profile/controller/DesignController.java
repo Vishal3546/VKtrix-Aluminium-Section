@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController("profileDesignController")
 @RequestMapping("/api/designs")
-@PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'PRODUCTION')")
+// @PreAuthorize("hasAnyRole('ADMIN', 'SALES', 'PRODUCTION')")
 public class DesignController {
 
     private final DesignService designService;
