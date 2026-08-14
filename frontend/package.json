@@ -1,37 +1,69 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "private": true,
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "electron:dev": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron:build": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.aluminium.app",
+    "productName": "Aluminium Section App",
+    "directories": {
+      "output": "dist",
+      "buildResources": "public"
+    },
+    "files": [
+      "out/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "YOUR_GITHUB_OWNER",
+        "repo": "YOUR_GITHUB_REPO"
+      }
+    ]
   },
   "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "electron-updater": "^6.8.9"
+  },
+  "devDependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
     "@radix-ui/react-select": "^2.3.7",
     "@radix-ui/react-slot": "^1.3.3",
     "@supabase/supabase-js": "^2.40.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
-    "konva": "^10.3.0",
-    "lucide-react": "^1.29.0",
-    "next": "latest",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-konva": "^19.2.5",
-    "tailwind-merge": "^3.6.0"
-  },
-  "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.5.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "concurrently": "^10.0.4",
+    "cross-env": "^10.1.0",
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3",
     "eslint": "^9.0.0",
     "eslint-config-next": "15.0.0",
+    "konva": "^10.3.0",
+    "lucide-react": "^1.29.0",
+    "next": "latest",
     "postcss": "^8.5.26",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-konva": "^19.2.5",
+    "tailwind-merge": "^3.6.0",
     "tailwindcss": "^3.4.19",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "wait-on": "^9.1.0"
   }
 }
