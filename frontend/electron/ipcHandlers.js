@@ -16,7 +16,7 @@ function registerIpcHandlers() {
       
       // Also save to local entities cache for instant offline read
       if (action === 'INSERT' || action === 'UPDATE') {
-        const id = payload.id || \`temp_\${Date.now()}\`; // Generate temp ID if none provided
+        const id = payload.id || `temp_${Date.now()}`; // Generate temp ID if none provided
         payload.id = id;
         
         const localStmt = db.prepare(`

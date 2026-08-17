@@ -1,9 +1,13 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
+const electronServe = require('electron-serve');
+const serve = electronServe.default || electronServe;
 const { initDB } = require('./database');
 const { startSyncService } = require('./syncService');
 const { registerIpcHandlers } = require('./ipcHandlers');
+
+const appServe = app.isPackaged ? serve({ directory: path.join(__dirname, '../out') }) : null;
 
 let mainWindow;
 
@@ -19,14 +23,13 @@ function createWindow() {
   });
 
   // Next.js dev server URL or production static files
-  const startUrl = process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:3000' 
-    : \`file://\${path.join(__dirname, '../out/index.html')}\`;
-
-  mainWindow.loadURL(startUrl);
-
   if (process.env.NODE_ENV === 'development') {
+    mainWindow.loadURL('http://localhost:3000');
     mainWindow.webContents.openDevTools();
+  } else {
+    appServe(mainWindow).then(() => {
+      mainWindow.loadURL('app://-');
+    });
   }
 
   mainWindow.on('closed', () => {
