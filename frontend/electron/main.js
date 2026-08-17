@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, dialog } = require('electron');
 const path = require('path');
 const { autoUpdater } = require('electron-updater');
 const electronServe = require('electron-serve');
@@ -53,6 +53,32 @@ app.whenReady().then(() => {
   // 5. Check for updates (only in production built app)
   if (app.isPackaged) {
     autoUpdater.checkForUpdatesAndNotify();
+    
+    autoUpdater.on('update-available', () => {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Update Available',
+        message: 'A new version of the software is available. It is downloading in the background.',
+        buttons: ['OK']
+      });
+    });
+
+    autoUpdater.on('update-downloaded', () => {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Update Ready',
+        message: 'A new version has been downloaded. Restart the application to apply the updates.',
+        buttons: ['Restart Now', 'Later']
+      }).then((result) => {
+        if (result.response === 0) {
+          autoUpdater.quitAndInstall();
+        }
+      });
+    });
+
+    autoUpdater.on('error', (err) => {
+      console.error('Error in auto-updater:', err);
+    });
   }
 
   app.on('activate', () => {
